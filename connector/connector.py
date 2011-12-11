@@ -51,6 +51,11 @@ class Connector(object):
 												 'type':self._s(r6),
 												 'is_conn':r7,
 												 'row':len(self.sshlist)+1})
+		
+	def mk_home_dir(self, path):
+		""" Создание директории для монтирования удалённого ресурса"""
+		if os.path.isdir(path) == False:
+			os.makedirs(path)
 
 	def create_list(self):
 		""" Заполняем список данными """
@@ -102,6 +107,8 @@ class Connector(object):
 		ok = False
 		if nID >= 0:
 			row = self.sshlist[nID]
+			###
+			self.mk_home_dir(row['homedir'])
 			###
 			if (row["type"] == "1"):
 				cmd = "".join(['sshfs ', row['login'], '@', row['host'], ':', row['remdir'], ' ', row['homedir'], ' -p ', row['port'],])
