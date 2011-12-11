@@ -1,3 +1,6 @@
 *.pyc
 connector/*.pyc
 forms/*.pyc
+.project
+.pydevproject
+.settings
