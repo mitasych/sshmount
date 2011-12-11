@@ -58,7 +58,6 @@ class Connector(object):
 		""" Создание директории для монтирования удалённого ресурса"""
 		if os.path.isdir(path) == False:
 			os.makedirs(path)
-			
 
 	def create_list(self):
 		""" Заполняем список данными """
