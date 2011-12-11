@@ -18,7 +18,7 @@ class Connector(object):
 	def __init__(self):
 		""" Инициализаци объекта """
 		self.home_dir = os.path.expanduser('~/') + '.sshconnector/'
-		self.home_file = os.path.expanduser('~/') + '.sshconnector/sshlist2'
+		self.home_file = os.path.expanduser('~/') + '.sshconnector/sshlist'
 		###
 		self.valid_dir()
 		self.valid_file()
@@ -51,8 +51,6 @@ class Connector(object):
 												 'type':self._s(r6),
 												 'is_conn':r7,
 												 'row':len(self.sshlist)+1})
-		print self._s(r3)
-		self.mk_home_dir(self._s(r3))
 		
 	def mk_home_dir(self, path):
 		""" Создание директории для монтирования удалённого ресурса"""
@@ -109,6 +107,8 @@ class Connector(object):
 		ok = False
 		if nID >= 0:
 			row = self.sshlist[nID]
+			###
+			self.mk_home_dir(row['homedir'])
 			###
 			if (row["type"] == "1"):
 				cmd = "".join(['sshfs ', row['login'], '@', row['host'], ':', row['remdir'], ' ', row['homedir'], ' -p ', row['port'],])
