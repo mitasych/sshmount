@@ -111,55 +111,21 @@ class Connector(object):
 			self.mk_home_dir(row['homedir'])
 			###
 			if (row["type"] == "1"):
-				cmd = "".join(['sshfs ', row['login'], '@', row['host'], ':', row['remdir'], ' ', row['homedir'], ' -p ', row['port'],])
+				cmd = "".join(['echo ', row['passwd'], ' | ','sshfs ', row['login'], '@', row['host'], ':', row['remdir'], ' ', row['homedir'], ' -p ', row['port'], ' -o password_stdin'])
 			elif (row["type"] == "2"):
 				cmd = "".join(["curlftpfs ftp://", row['login'], ":", row['passwd'], "@", row['host'], ":", row['port'], " ", row['homedir'],])
 			###
-			self.sshfs = pexpect.spawn(cmd, env = {'SSH_ASKPASS':'/dev/null'})
-			self.ssh_newkey = 'Are you sure you want to continue connecting'
-			i = self.sshfs.expect([self.ssh_newkey, 'assword:', pexpect.EOF, pexpect.TIMEOUT])
-			###
-			if (i == 0):
-				if (row["type"] == "1"):
-					self.sshfs.sendline('yes')
-					i = self.sshfs.expect([self.ssh_newkey, 'assword:', pexpect.EOF])
-				elif (row["type"] == "2"):
-					ok = True
-			###
-			if (i == 1):
-				self.sshfs.sendline(row['passwd'])
-				j = self.sshfs.expect([pexpect.EOF, 'assword:'])
-				###
-				if (j == 0):
-					if (self.sshfs.before.strip() == ''):
-						ok == True
-						self.sshlist[nID]['is_conn'] = True
-					else:
-						MessageBox("Error found: %s" % self.sshfs.before)
-				elif (j == 1):
-					MessageBox("Password incorrect")
-				elif (j == 0):
-					print self.sshfs.before
-			elif (i == 2):
-				if (row["type"] == "1"):
-					MessageBox("Error found: %s" % self.sshfs.before)
-				elif (row["type"] == "2"):
-					if (self.sshfs.before.strip() <> ''):
-						MessageBox("Error found: %s" % self.sshfs.before)
-					else:
-						ok = True
-						self.sshlist[nID]['is_conn'] = True
-			elif (i == 3):
-				if (row["type"] == "1"):
-					MessageBox("Timeout: %s" % self.sshfs.before)
-				elif (row["type"] == "2"):
-					if (self.sshfs.before.strip() <> ''):
-						MessageBox("Timeout: %s" % self.sshfs.before)
-					else:
-						ok = True
-						self.sshlist[nID]['is_conn'] = True
-			###
-			self.sshfs.close(True)
+			
+			try:
+				mount = getoutput(cmd)
+				if self._s(mount) <> '':
+					MessageBox(mount)
+				else:
+					ok == True
+					self.sshlist[nID]['is_conn'] = True
+			except:
+				MessageBox(sys.exc_info()[1])
+			
 		###
 		return ok
 
